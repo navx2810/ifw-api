@@ -1,0 +1,51 @@
+restify = require 'restify'
+server = restify.createServer()
+config = require './config.json'
+db = require './db'
+
+server.use restify.bodyParser()
+server.use restify.queryParser()
+
+server.use restify.CORS (origins: ['*'], methods: ['GET', 'POST', 'PUT'])
+
+# server.pre (req, res, next) ->
+#    res.header 'Access-Control-Allow-Origin', '*'
+#    res.header 'Access-Control-Methods', 'GET,POST,UPDATE'
+#    res.header 'Access-Control-Allow-Headers', 'Content-Type'
+#    next()
+
+server.use (req, res, next) ->
+   if req.body.key isnt config.secret
+      console.log "no key"
+      res.send new BadRequestError 'wrong key'
+   next()
+
+server.post '/create', (req, res, next) ->
+   {email, pass, json} = req.body
+
+   res.send 409, "You done did fuck up"
+
+   db.query 'select id from accounts where email=?', [email], (err, rows) ->
+      console.log "Row length is #{rows.length}"
+      if rows.length isnt 0
+         res.send 409, "Account already exists with that email"
+      else
+         db.query "insert into accounts(email, password, json) values(?,?,?)", [email, pass, JSON.stringify json], (err, rows) ->
+            console.log "Insert error is #{err}"
+            console.log "Rows: #{JSON.stringify rows}"
+            res.send 200, "everything's fine"
+
+
+
+   # Check if user already exists
+      # if not do the insert
+   # if so throw an error
+
+   res.end()
+
+server.post '/login', (req, res, next) ->
+   console.log
+
+
+server.listen 8000, ->
+   console.log "server listening on 8000"

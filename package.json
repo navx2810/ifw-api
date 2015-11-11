@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mongoose": "^4.2.4",
+    "restify": "^4.0.3"
+  },
+  "scripts": {
+    "start": "cls && coffee main.coffee",
+    "sync": "cls && coffee sync.coffee"
+  }
+}
