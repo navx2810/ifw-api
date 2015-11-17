@@ -2,6 +2,8 @@ restify = require 'restify'
 server = restify.createServer()
 config = require './config.json'
 Model = require './models'
+chalk = require 'chalk'
+prettyjson = require 'prettyjson'
 
 crypto = require 'crypto'
 
@@ -15,7 +17,7 @@ server.use restify.CORS (origins: ['*'], methods: ['GET', 'POST', 'PUT'], header
 
 server.use (req, res, next) ->
    if req.headers.key isnt config.secret
-      console.log "no key"
+      console.log chalk.red "No key is available!"
       res.send new BadRequestError 'wrong key'
    next()
 
@@ -25,6 +27,8 @@ server.post '/create', (req, res, next) ->
    parsed_json = JSON.parse json
    hashed_pass = crypto.createHash('sha256').update(pass).digest('hex')
 
+   console.log "#{chalk.blue '[POST]'} request for creating a new account\n#{prettyjson.render (email: email, pass: hashed_pass)}"
+
    if not /^[a-z0-9\-]+@[a-z0-9\-]+(\.[a-z0-9\-]+)+/i.test email
       res.send 400, "Invalid email address"
 
@@ -33,9 +37,10 @@ server.post '/create', (req, res, next) ->
          res.send 400, err
       if !account
          new_account = new Model email: email, pass: hashed_pass, data: parsed_json
+         console.log "#{chalk.green 'ACCOUNT CREATED!'}\n#{prettyjson.render (email:email, password: hashed_pass)}\n"
          new_account.save (err) -> if err then console.log err else res.json id: new_account._id, email: new_account.email
       else
-         console.log "Account pass: #{account.pass}, Hashed pass: #{hashed_pass}"
+         console.log "#{chalk.blue 'ACCOUNT FOUND!'}\n#{prettyjson.render (AccountPassword: account.pass, HashedPassword: hashed_pass)}\n"
          if account.pass is hashed_pass
             res.json id: account._id, email: account.email
          else
@@ -46,10 +51,13 @@ server.post '/login', (req, res, next) ->
 
    hashed_pass = crypto.createHash('sha256').update(pass).digest('hex')
 
+   console.log "#{chalk.blue '[POST]'} request for logging in\n#{prettyjson.render (email: email, pass: hashed_pass)}\n"
+
    Model.findOne (email: email), (err, account) ->
       if err
          res.send 400, err
       if account and account.pass is hashed_pass
+         console.log "#{chalk.green 'ACCOUNT FOUND!'} returning ID: #{account._id}\n"
          res.json id: account._id, email: account.email
       else if !account
          res.send 409, "No account exists with that email address"
@@ -59,10 +67,13 @@ server.post '/login', (req, res, next) ->
 server.get '/accounts', (req, res, next) ->
    {id} = req.params
 
+   console.log "#{chalk.blue '[GET]'} ID: #{id}"
+
    Model.findOne (_id: id), (err, account) ->
       if err?
          res.send 400, err
       if account?
+         console.log "#{chalk.green 'ACCOUNT FOUND!'}\n#{prettyjson.render (id: id)}\n\nSpitting out data\n\n#{prettyjson.render account.data}\n"
          res.json account.data
       else
          res.send 400, "No account with that id"
@@ -71,14 +82,17 @@ server.put '/accounts', (req, res, next) ->
    {id} = req.params
    {data} = req.body
 
+   console.log "#{chalk.blue '[PUT]'} request for saving\n#{prettyjson.render (id: id)}\n\n#{prettyjson.render (NewData: JSON.parse data)}\n"
+
    Model.findOne (_id: id), (err, account) ->
       if err?
          res.send 400, err
       if account?
          account.data = JSON.parse data
+         console.log "#{chalk.green 'ACCOUNT FOUND!'} ID: #{id}\n\n#{prettyjson.render JSON.parse data}\n"
          account.save (err) -> if err then res.send 400, err else res.send 200
       else
          res.send 400, "No account with that id"
 
 server.listen 8000, ->
-   console.log "server listening on 8000"
+   console.log "#{chalk.cyan 'server listening on 8000'}"
