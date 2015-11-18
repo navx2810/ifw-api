@@ -44,6 +44,7 @@ server.post '/create', (req, res, next) ->
          if account.pass is hashed_pass
             res.json id: account._id, email: account.email
          else
+            console.log "#{chalk.red 'ACCOUNT ALREADY EXISTS'} an account already exists with this email"
             res.send 409, "Account already exists with that email"
 
 server.post '/login', (req, res, next) ->
@@ -60,8 +61,10 @@ server.post '/login', (req, res, next) ->
          console.log "#{chalk.green 'ACCOUNT FOUND!'} returning ID: #{account._id}\n"
          res.json id: account._id, email: account.email
       else if !account
+         console.log "#{chalk.red 'ACCOUNT NOT FOUND!'} No account exists with the email address that was given\n"
          res.send 409, "No account exists with that email address"
       else
+         console.log "#{chalk.red 'WRONG ACCOUNT DETAILS'}\n#{prettyjson.render (AccountPass: account.pass, HashedPass: hashed_pass)}\n"
          res.send 409, "Wrong account details"
 
 server.get '/accounts', (req, res, next) ->
