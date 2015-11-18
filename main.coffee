@@ -70,7 +70,7 @@ server.post '/login', (req, res, next) ->
 server.get '/accounts', (req, res, next) ->
    {id} = req.params
 
-   console.log "#{chalk.blue '[GET]'} ID: #{id}"
+   console.log "#{chalk.blue '[GET]'} request for last saved data from the db\n#{prettyjson.render (ID: id)}\n"
 
    Model.findOne (_id: id), (err, account) ->
       if err?
