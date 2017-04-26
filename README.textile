@@ -1,0 +1,28 @@
+h1. Idler Framework API
+
+h2. What is this?
+
+This repository contains the source code for the API that my capstone, "Idler Framework":https://github.com/navx2810/ifw-cs, used to do CRUD work.
+
+The goal of the project was to create an application in a few weeks which assisted game developers in creating *Idler* games.
+
+h3. Technology (Requirements)
+
+- CoffeeScript := one of the requirement was a new language, since CoffeeScript was foreign to me, it fit the bill.
+- MongoDB := one of the requirements was a database component. I decided to learn something new. MongoDB was a fit for my needs. Most of my data fit, loosely, into a document format, but most of it was consumed through JSON, so MongoDB was an O.K. choice.
+- Mongoose := an ORM was used to communicate with MongoDB and define a schema for the document database.
+- Restify := restify was used to create a light-weight server that consumed and produced JSON requests. It is a spin-off from express which removes features such as the templating engine.
+
+h3. Research
+
+The whole process of creating a web application was new to me. Almost all aspects of this project contributed to the research portion of the project.
+
+h4. Post-Mortem
+
+For the most part, the project was a success. The front-end was done in under a week, while the back-end was done in a few days. In the beginning of the semester, I started out with React, but ran into a few errors that brought the project to a grinding halt. About halfway through I switched to Mithril.
+
+The project did what I planned it to do. There was no compromises made. I set the bar pretty low, but it was high enough to be impressive to my fellow students and professors.
+
+I no longer use most of the technology used in this project. While I still use Restify, I usually do most of it by hand. I have had no need for an ORM. Most of my API routes now follow a good (and mostly sane) structure. Most front-end work I do is either in Vue or React (as of the start of 2017). React alongside MobX is very close to what Mithril is.
+
+For a two week-long project, I am happy with what this program came to be. It's very rough and messy, but it worked for everyone's needs. 
